@@ -26,7 +26,7 @@ $ export AWSSecretKey=j3jfijfisa83j+io4jfioajioaw
 EXAMPLE OUTPUT
 ===============
 ```
-vela:~/dev epheph$ ./ec2-check-reserved-instances.py Disqualifying instance i-8bbd8ce7: not running
+vela:~/dev epheph$ ./ec2-check-reserved-instances.py
 UNUSED RESERVATION!	(1)	m1.small	us-east-1b
 UNUSED RESERVATION!	(1)	m2.xlarge	us-east-1a
 
