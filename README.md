@@ -28,7 +28,7 @@ EXAMPLE OUTPUT
 ```
 vela:~/dev epheph$ ./ec2-check-reserved-instances.py
 UNUSED RESERVATION!	(1)	m1.small	us-east-1b
-UNUSED RESERVATION!	(1)	m2.xlarge	us-east-1a
+UNUSED RESERVATION!	(1)	m2.2xlarge	us-east-1a
 
 Instance not reserved:	(1)	t1.micro	us-east-1c
 Instance not reserved:	(2)	m1.small	us-east-1d
