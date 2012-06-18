@@ -65,7 +65,7 @@ for placement_key in running_instances:
 
 # pprint ( instance_diff )
 
-unused_reservations = dict((key,value) for key, value in instance_diff.iteritems() if value > -1)
+unused_reservations = dict((key,value) for key, value in instance_diff.iteritems() if value > 0)
 if unused_reservations == {}:
 	print "Congratulations, you have no unused reservations"
 else:
