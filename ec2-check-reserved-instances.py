@@ -3,11 +3,35 @@
 import sys
 import os
 import boto
+import boto.ec2
 from pprint import pprint
+import argparse
+from argparse import RawTextHelpFormatter
+
+AWS_REGIONS = ['ap-northeast-1',
+               'ap-southeast-1',
+               'ap-southeast-2',
+               'eu-west-1',
+               'sa-east-1',
+               'us-east-1',
+               'us-west-1',
+               'us-west-2']
 
 # You can uncomment and set these, or set the env variables AWSAccessKeyId & AWSSecretKey
 # AWS_ACCESS_KEY_ID="aaaaaaaaaaaaaaaaaaaa"
 # AWS_SECRET_ACCESS_KEY="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+
+regiontxt = "If not specified then region us-east-1 is used.\nAvailable regions:\n\n  %s" % ( "\n  ".join(AWS_REGIONS))
+
+parser = argparse.ArgumentParser(description='List a summary of AWS EC2 reservations', epilog=regiontxt, formatter_class=RawTextHelpFormatter)
+parser.add_argument('-r', '--region', help="EC2 region name", required=False)
+args = parser.parse_args()
+
+if args.region is not None:
+	if not args.region in AWS_REGIONS:
+		print "Unknown region: %s" % ( args.region )
+		sys.exit(-1)
+
 
 try:
 	AWS_ACCESS_KEY_ID
@@ -19,8 +43,11 @@ except NameError:
 		print "Please set env variable"
 		sys.exit(1)
 
+if args.region:
+	ec2_conn = boto.ec2.connect_to_region(args.region, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+else:
+	ec2_conn = boto.connect_ec2(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 
-ec2_conn = boto.connect_ec2(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 reservations = ec2_conn.get_all_instances()
 
 running_instances = {}
@@ -53,7 +80,6 @@ for reserved_instance in ec2_conn.get_all_reserved_instances():
 
 # pprint( reserved_instances )
 
-
 # this dict will have a positive number if there are unused reservations
 # and negative number if an instance is on demand
 instance_diff = dict([(x, reserved_instances[x] - running_instances.get(x, 0 )) for x in reserved_instances])
@@ -81,7 +107,14 @@ else:
 	for unreserved_instance in unreserved_instances:
 		print "Instance not reserved:\t(%s)\t%s\t%s" % ( unreserved_instances[ unreserved_instance ], unreserved_instance[0], unreserved_instance[1] )
 
-qty_running_instances = reduce( lambda x, y: x+y, running_instances.values() )
-qty_reserved_instances = reduce( lambda x, y: x+y, reserved_instances.values() )
+if running_instances.values():
+	qty_running_instances = reduce( lambda x, y: x+y, running_instances.values() )
+else:
+	qty_running_instances = 0
+
+if reserved_instances.values():
+	qty_reserved_instances = reduce( lambda x, y: x+y, reserved_instances.values() )
+else:
+	qty_reserved_instances = 0
 
 print "\n(%s) running on-demand instances\n(%s) reservations" % ( qty_running_instances, qty_reserved_instances )
