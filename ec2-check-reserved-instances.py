@@ -7,6 +7,7 @@ import boto.ec2
 from pprint import pprint
 import argparse
 from argparse import RawTextHelpFormatter
+from collections import defaultdict
 
 AWS_REGIONS = ['ap-northeast-1',
                'ap-southeast-1',
@@ -25,6 +26,7 @@ regiontxt = "If not specified then region us-east-1 is used.\nAvailable regions:
 
 parser = argparse.ArgumentParser(description='List a summary of AWS EC2 reservations', epilog=regiontxt, formatter_class=RawTextHelpFormatter)
 parser.add_argument('-r', '--region', help="EC2 region name", required=False)
+parser.add_argument('-n', '--names', help="Include names or instance IDs of instances that fit non-reservations", required=False, action='store_true')
 args = parser.parse_args()
 
 if args.region is not None:
@@ -51,6 +53,7 @@ else:
 reservations = ec2_conn.get_all_instances()
 
 running_instances = {}
+instance_ids = defaultdict(list)
 for reservation in reservations:
 	for instance in reservation.instances:
 		if instance.state != "running":
@@ -65,6 +68,10 @@ for reservation in reservations:
 				instance_type = instance.instance_type
 				running_instances[ (instance_type, az ) ] = running_instances.get( (instance_type, az ) , 0 ) + 1
 
+				if "Name" in instance.tags and len(instance.tags['Name']) > 0:
+					instance_ids[ (instance_type, az ) ].append(instance.tags['Name'])
+				else:
+					instance_ids[ (instance_type, az ) ].append(instance.id)
 
 # pprint( running_instances )
 
@@ -104,8 +111,11 @@ unreserved_instances = dict((key,-value) for key, value in instance_diff.iterite
 if unreserved_instances == {}:
 	print "Congratulations, you have no unreserved instances"
 else:
+	ids=""
 	for unreserved_instance in unreserved_instances:
-		print "Instance not reserved:\t(%s)\t%s\t%s" % ( unreserved_instances[ unreserved_instance ], unreserved_instance[0], unreserved_instance[1] )
+		if args.names is not None:
+			ids = ', '.join(sorted(instance_ids[unreserved_instance]))
+		print "Instance not reserved:\t(%s)\t%s\t%s\t%s" % ( unreserved_instances[ unreserved_instance ], unreserved_instance[0], unreserved_instance[1], ids )
 
 if running_instances.values():
 	qty_running_instances = reduce( lambda x, y: x+y, running_instances.values() )
