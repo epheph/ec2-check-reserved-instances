@@ -113,7 +113,7 @@ if unreserved_instances == {}:
 else:
 	ids=""
 	for unreserved_instance in unreserved_instances:
-		if args.names is not None:
+		if args.names:
 			ids = ', '.join(sorted(instance_ids[unreserved_instance]))
 		print "Instance not reserved:\t(%s)\t%s\t%s\t%s" % ( unreserved_instances[ unreserved_instance ], unreserved_instance[0], unreserved_instance[1], ids )
 
