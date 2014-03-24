@@ -31,12 +31,9 @@ for reservation in reservations:
 		elif instance.spot_instance_request_id:
 			sys.stderr.write("Disqualifying instance %s: spot\n" % ( instance.id ) )
 		else:
-			if instance.vpc_id:
-				print "Does not support vpc yet, please be careful when trusting these results"
-			else:
-				az = instance.placement
-				instance_type = instance.instance_type
-				running_instances[ (instance_type, az ) ] = running_instances.get( (instance_type, az ) , 0 ) + 1
+			az = instance.placement
+			instance_type = instance.instance_type
+			running_instances[ (instance_type, az ) ] = running_instances.get( (instance_type, az ) , 0 ) + 1
 
 
 # pprint( running_instances )
