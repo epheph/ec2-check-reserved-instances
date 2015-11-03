@@ -16,19 +16,10 @@ from argparse import RawTextHelpFormatter
 from collections import defaultdict
 import ConfigParser
 
-AWS_REGIONS = ['ap-northeast-1',
-               'ap-southeast-1',
-               'ap-southeast-2',
-               'eu-west-1',
-               'eu-central-1',
-               'sa-east-1',
-               'us-east-1',
-               'us-west-1',
-               'us-west-2']
+AWS_REGIONS = []
 
-# You can uncomment and set these, or set the env variables AWSAccessKeyId & AWSSecretKey
-# AWS_ACCESS_KEY_ID="aaaaaaaaaaaaaaaaaaaa"
-# AWS_SECRET_ACCESS_KEY="bbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbbb"
+for f in boto.ec2.regions():
+	AWS_REGIONS.append(f.name)
 
 regiontxt = "If not specified then region us-east-1 is used.\nAvailable regions:\n\n  %s" % ( "\n  ".join(AWS_REGIONS))
 
