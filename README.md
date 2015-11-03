@@ -17,11 +17,22 @@ $ pip install boto
 
 
 
-The only configuration needed is your AWS keys. These can either be modified at the top of the file, ec2-check-reserved-instances.py, or by exporting your keys in an environment variable:
+The script will attempt to use the environment variables AWSAccessKeyId and AWSSecretKey. If these are not present it will fall back to using config details from the 'aws' cli tool ( ~/.aws/config ) 
+
+Either:
 
 $ export AWSAccessKeyId=1234567
-
 $ export AWSSecretKey=j3jfijfisa83j+io4jfioajioaw
+
+Or, put in: ~/.aws/config :
+```
+[default]
+aws_access_key_id = 1234567
+aws_secret_access_key = j3jfijfisa83j+io4jfioajioaw
+region = eu-west-1
+output = json
+```
+
 
 EXAMPLE OUTPUT
 ===============
@@ -48,8 +59,5 @@ In this example, you can easily see that an m2.2xlarge was spun up in the wrong 
 TODO
 ===============
 - Add some sort of sorting, by Availability Zone/instance type
-- Add VPC support
-- Currently only supports US-EAST. Make using other regions easy, perhaps just using an environment variable/internal config variable
-- External config? Is there some standard place to store AWS credentials?
 - Add option to use API to purchase the additional reservations (need to be EXTREMELY careful here, any mistake or miscommunication could cost quite a bit of money)
 - Windows? Not taking Windows reserved instances into account
