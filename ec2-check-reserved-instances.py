@@ -27,12 +27,13 @@ parser = argparse.ArgumentParser(description='List a summary of AWS EC2 reservat
 parser.add_argument('-r', '--region', help="EC2 region name", required=False)
 parser.add_argument('-n', '--names', help="Include names or instance IDs of instances that fit non-reservations", required=False, action='store_true')
 args = parser.parse_args()
+REGION = None
 
 if args.region is not None:
 	if not args.region in AWS_REGIONS:
 		print "Unknown region: %s" % ( args.region )
 		sys.exit(-1)
-
+	REGION = args.region
 
 AWS_ACCESS_KEY_ID=os.environ.get('AWSAccessKeyId')
 AWS_SECRET_ACCESS_KEY=os.environ.get('AWSSecretKey')
@@ -44,13 +45,15 @@ if AWS_ACCESS_KEY_ID == None and AWS_SECRET_ACCESS_KEY == None:
 		config.read(aws_config)
 		AWS_ACCESS_KEY_ID = config.get('default', 'aws_access_key_id')
 		AWS_SECRET_ACCESS_KEY = config.get('default', 'aws_secret_access_key')
+		if REGION is None:
+			REGION = config.get('default', 'region')
 
 if AWS_ACCESS_KEY_ID == None and AWS_SECRET_ACCESS_KEY == None:
 	print "Please set env variables (AWSAccessKeyId, AWSSecretKey), or populate ~/.aws/config (official aws client)"
 	sys.exit(1)
 
-if args.region:
-	ec2_conn = boto.ec2.connect_to_region(args.region, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
+if REGION is not None:
+	ec2_conn = boto.ec2.connect_to_region(REGION, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
 else:
 	ec2_conn = boto.connect_ec2(AWS_ACCESS_KEY_ID, AWS_SECRET_ACCESS_KEY)
 
