@@ -13,6 +13,7 @@ AWS_REGIONS = ['ap-northeast-1',
                'ap-southeast-1',
                'ap-southeast-2',
                'eu-west-1',
+               'eu-central-1',
                'sa-east-1',
                'us-east-1',
                'us-west-1',
@@ -65,10 +66,10 @@ for reservation in reservations:
 			instance_type = instance.instance_type
 			running_instances[ (instance_type, az ) ] = running_instances.get( (instance_type, az ) , 0 ) + 1
 
-				if "Name" in instance.tags and len(instance.tags['Name']) > 0:
-					instance_ids[ (instance_type, az ) ].append(instance.tags['Name'])
-				else:
-					instance_ids[ (instance_type, az ) ].append(instance.id)
+			if "Name" in instance.tags and len(instance.tags['Name']) > 0:
+				instance_ids[ (instance_type, az ) ].append(instance.tags['Name'])
+			else:
+				instance_ids[ (instance_type, az ) ].append(instance.id)
 
 # pprint( running_instances )
 
