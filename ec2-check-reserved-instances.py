@@ -1,5 +1,11 @@
 #!/usr/bin/python
 
+""" 
+Checks ec2 instances in a region, to see if they have matching reservations 
+
+Requires either ~/.aws/config ini file, or env. variables AWSAccessKeyId or AWSSecretKey 
+"""
+
 import sys
 import os
 import boto
@@ -8,6 +14,7 @@ from pprint import pprint
 import argparse
 from argparse import RawTextHelpFormatter
 from collections import defaultdict
+import ConfigParser
 
 AWS_REGIONS = ['ap-northeast-1',
                'ap-southeast-1',
@@ -36,15 +43,20 @@ if args.region is not None:
 		sys.exit(-1)
 
 
-try:
-	AWS_ACCESS_KEY_ID
-except NameError:
-	try:
-		AWS_ACCESS_KEY_ID=os.environ['AWSAccessKeyId']
-		AWS_SECRET_ACCESS_KEY=os.environ['AWSSecretKey']
-	except KeyError:
-		print "Please set env variable"
-		sys.exit(1)
+AWS_ACCESS_KEY_ID=os.environ.get('AWSAccessKeyId')
+AWS_SECRET_ACCESS_KEY=os.environ.get('AWSSecretKey')
+
+if AWS_ACCESS_KEY_ID == None and AWS_SECRET_ACCESS_KEY == None:
+	aws_config = os.path.expanduser("~/.aws/config")
+	if os.path.exists(aws_config):
+		config = ConfigParser.ConfigParser()
+		config.read(aws_config)
+		AWS_ACCESS_KEY_ID = config.get('default', 'aws_access_key_id')
+		AWS_SECRET_ACCESS_KEY = config.get('default', 'aws_secret_access_key')
+
+if AWS_ACCESS_KEY_ID == None and AWS_SECRET_ACCESS_KEY == None:
+	print "Please set env variables (AWSAccessKeyId, AWSSecretKey), or populate ~/.aws/config (official aws client)"
+	sys.exit(1)
 
 if args.region:
 	ec2_conn = boto.ec2.connect_to_region(args.region, aws_access_key_id=AWS_ACCESS_KEY_ID, aws_secret_access_key=AWS_SECRET_ACCESS_KEY)
