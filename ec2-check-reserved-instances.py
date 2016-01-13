@@ -81,7 +81,7 @@ else:
 	for unreserved_instance in unreserved_instances:
 		print "Instance not reserved:\t(%s)\t%s\t%s" % ( unreserved_instances[ unreserved_instance ], unreserved_instance[0], unreserved_instance[1] )
 
-qty_running_instances = reduce( lambda x, y: x+y, running_instances.values() )
-qty_reserved_instances = reduce( lambda x, y: x+y, reserved_instances.values() )
+qty_running_instances = reduce( lambda x, y: x+y, running_instances.values() or [0] )
+qty_reserved_instances = reduce( lambda x, y: x+y, reserved_instances.values() or [0] )
 
 print "\n(%s) running on-demand instances\n(%s) reservations" % ( qty_running_instances, qty_reserved_instances )
