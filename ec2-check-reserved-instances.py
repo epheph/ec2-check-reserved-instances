@@ -13,8 +13,8 @@ try:
 	AWS_ACCESS_KEY_ID
 except NameError:
 	try:
-		AWS_ACCESS_KEY_ID=os.environ['AWSAccessKeyId']
-		AWS_SECRET_ACCESS_KEY=os.environ['AWSSecretKey']
+		AWS_ACCESS_KEY_ID=os.environ['AWS_ACCESS_KEY_ID']
+		AWS_SECRET_ACCESS_KEY=os.environ['AWS_SECRET_ACCESS_KEY']
 	except KeyError:
 		print "Please set env variable"
 		sys.exit(1)
